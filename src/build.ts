@@ -29,6 +29,7 @@ export async function build() {
 		entrypoints: entryPaths,
 		outdir: "./build",
 		naming: `[dir]/indexes/[name].${buildTimeStamp}.[ext]`,
+		//splitting: true,
 		minify: true
 	});
 
