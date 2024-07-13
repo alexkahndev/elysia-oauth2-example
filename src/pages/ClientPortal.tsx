@@ -3,7 +3,6 @@ import { Footer } from "../components/utils/Footer";
 import { useState } from "react";
 import { useAuthStatus } from "../hooks/useAuthStatus";
 
-
 export const ClientPortal = () => {
 	const [count, setCount] = useState(0);
 	const [isLoggedIn, setIsLoggedIn] = useAuthStatus();
@@ -27,10 +26,7 @@ export const ClientPortal = () => {
 					margin: "0"
 				}}
 			>
-				<Navbar 
-					isLoggedIn={isLoggedIn} 
-					setIsLoggedIn={setIsLoggedIn}
-				/>
+				<Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
 				<main
 					style={{
 						flex: "1",

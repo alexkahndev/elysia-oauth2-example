@@ -7,11 +7,16 @@ import { Home } from "./pages/Home";
 import { ClientPortal } from "./pages/ClientPortal";
 import { oauth2 } from "elysia-oauth2";
 import { build } from "./build";
+import { authGoogle, authGoogleCallback } from "./handlers/googleAuthHandlers";
 
 const host = Bun.env.HOST || "localhost";
 const port = Bun.env.PORT || 3000;
 
-if (!Bun.env.GOOGLE_CLIENT_ID || !Bun.env.GOOGLE_CLIENT_SECRET || !Bun.env.GOOGLE_REDIRECT_URI) {
+if (
+    !Bun.env.GOOGLE_CLIENT_ID ||
+    !Bun.env.GOOGLE_CLIENT_SECRET ||
+    !Bun.env.GOOGLE_REDIRECT_URI
+) {
     console.error("Google OAuth2 credentials are missing");
     process.exit(1);
 }
@@ -29,6 +34,19 @@ async function handleRequest(pageComponent: any, index: string) {
     return new Response(stream, {
         headers: { "Content-Type": "text/html" }
     });
+}
+
+async function revokeGoogleToken(accessToken: string) {
+    const response = await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${accessToken}`, {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/x-www-form-urlencoded'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to revoke token');
+    }
 }
 
 export const server = new Elysia()
@@ -56,22 +74,8 @@ export const server = new Elysia()
     .get("/", () =>
         handleRequest(Home, `indexes/HomeIndex.${buildTimeStamp}.js`)
     )
-    .get("/auth/google", ({ oauth2 }) => oauth2.redirect("Google"))
-    .get("/auth/google/callback", async ({ oauth2, cookie }) => {
-        const token = await oauth2.authorize("Google");
-        const redirectUrl = cookie.redirectUrl.value || "/";
-
-        cookie.authToken.value = token;
-
-        cookie.redirectUrl.remove();
-
-        return new Response(null, {
-            status: 302,
-            headers: {
-                Location: redirectUrl
-            }
-        });
-    })
+    .get("/auth/google", authGoogle)
+    .get("/auth/google/callback", authGoogleCallback)
     .get("/portal", () =>
         handleRequest(
             ClientPortal,
@@ -82,18 +86,35 @@ export const server = new Elysia()
         const url = request.headers.get("Referer");
         cookie.redirectUrl.value = url;
 
-        return new Response("OK");
+        return new Response(null, {
+            status: 204
+        });
     })
-    .post("/api/logout", ({ cookie }) => {
+    .post("/logout", async ({ cookie }) => {
+        const accessToken = cookie.authToken.value?.accessToken;
+
+        if (accessToken) {
+            try {
+                await revokeGoogleToken(accessToken);
+            } catch (error) {
+				if (error instanceof Error) {
+                console.error("Failed to revoke token:", error.message);
+				}}
+        }
+
         cookie.authToken.remove();
-        return new Response("OK");
+        cookie.redirectUrl.remove();
+
+        return new Response(null, {
+            status: 204
+        });
     })
-	.get("/api/auth-status", ({ cookie }) => {
-		const isLoggedIn = Boolean(cookie.authToken.value);
-		return new Response(JSON.stringify({ isLoggedIn }), {
-			headers: { "Content-Type": "application/json" }
-		});
-	})	
+    .get("/auth-status", ({ cookie }) => {
+        const isLoggedIn = Boolean(cookie.authToken.value);
+        return new Response(JSON.stringify({ isLoggedIn }), {
+            headers: { "Content-Type": "application/json" }
+        });
+    })
     .listen(port, () => {
         console.log(`server started on http://${host}:${port}`);
     })

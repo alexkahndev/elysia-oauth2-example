@@ -6,7 +6,7 @@ import { useAuthStatus } from "../hooks/useAuthStatus";
 export const Home = () => {
 	const [color, setColor] = useState<string>("#007BFF");
 	const [isLoggedIn, setIsLoggedIn] = useAuthStatus();
-	
+
 	const colors = [
 		"#007BFF",
 		"#6f42c1",
@@ -59,10 +59,7 @@ export const Home = () => {
 					margin: "0"
 				}}
 			>
-				<Navbar
-					isLoggedIn={isLoggedIn}
-					setIsLoggedIn={setIsLoggedIn}
-				/>
+				<Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
 				<main
 					style={{
 						flex: "1",
