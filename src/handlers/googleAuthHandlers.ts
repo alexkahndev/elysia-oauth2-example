@@ -2,11 +2,7 @@ import jwt from 'jsonwebtoken';
 import { AuthHandler } from "../types/authTypes";
 
 export const authGoogle = ({ oauth2 }: AuthHandler) => oauth2.redirect("Google", {
-    scope: [
-        "openid",
-        "email",
-        "profile",
-    ],
+    scope: "https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email"
 });
 
 export const authGoogleCallback = async ({
@@ -26,6 +22,23 @@ export const authGoogleCallback = async ({
         console.log("Decoded token:", decoded);
 
         const userSub = decoded.sub;
+
+        // Make a request to the Google UserInfo API to get user info using fetch
+        const userInfoResponse = await fetch('https://www.googleapis.com/userinfo/v2/me', {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+
+        if (!userInfoResponse.ok) {
+            throw new Error(`Failed to fetch user info: ${userInfoResponse.statusText}`);
+        }
+
+        const userInfo = await userInfoResponse.json();
+
+        // Log user info
+        console.log("User Info:", userInfo);
 
         const redirectUrl = cookie.redirectUrl.value || "/";
 
