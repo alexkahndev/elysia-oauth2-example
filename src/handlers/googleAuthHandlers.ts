@@ -52,7 +52,10 @@ export const authGoogleCallback = async ({
 
 		const redirectUrl = cookie.redirectUrl.value || "/";
 
+		// @ts-expect-error
 		cookie.googleAuthToken.value = token;
+		
+		// @ts-expect-error
 		cookie.user.value = user;
 		cookie.redirectUrl.remove();
 

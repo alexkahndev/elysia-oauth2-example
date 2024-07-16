@@ -84,22 +84,24 @@ export const server = new Elysia()
 type Server = typeof server;
 export type AuthContext = Context<RouteBase, Server["singleton"]>;
 
-// const authGoogleCookieType = t.Cookie({
-// 	googleAuthToken: t.String(),
-// 	user: t.Object({
-// 		id: t.Number(),
-// 		name: t.String(),
-// 		email: t.String()
-// 	}),
-// 	redirectUrl: t.String()
-// });
+const authGoogleCookieType = t.Cookie({
+	googleAuthToken: t.String(),
+	user: t.Object({
+		id: t.Number(),
+		name: t.String(),
+		email: t.String()
+	}),
+	redirectUrl: t.String()
+});
 
 server
 	.get("/", () =>
 		handleRequest(Home, `indexes/HomeIndex.${buildTimeStamp}.js`)
 	)
 	.get("/auth/google", authGoogle)
-	.get("/auth/google/callback", authGoogleCallback)
+	.get("/auth/google/callback", authGoogleCallback,{
+		cookie: authGoogleCookieType
+	})
 	.get("/portal", () =>
 		handleRequest(
 			ClientPortal,

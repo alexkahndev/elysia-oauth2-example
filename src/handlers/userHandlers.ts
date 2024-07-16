@@ -100,9 +100,11 @@ export const createUser = async ({
 	const newUser = await db
 		.insert(schema.users)
 		.values({
-			event_games_sub: 1,
 			auth_sub: authSub,
-			email: "example@example.com"
+			event_games_sub,
+			email,
+			given_name: givenName,
+			family_name: familyName
 		})
 		.returning();
 
