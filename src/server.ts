@@ -20,25 +20,25 @@ import { drizzle } from "drizzle-orm/neon-http";
 const host = Bun.env.HOST || "localhost";
 const port = Bun.env.PORT || 3000;
 
-if (
-	!Bun.env.GOOGLE_CLIENT_ID ||
-	!Bun.env.GOOGLE_CLIENT_SECRET ||
-	!Bun.env.GOOGLE_REDIRECT_URI
-) {
-	throw new Error("Google OAuth2 credentials are not set in .env file");
-}
+// if (
+// 	!Bun.env.GOOGLE_CLIENT_ID ||
+// 	!Bun.env.GOOGLE_CLIENT_SECRET ||
+// 	!Bun.env.GOOGLE_REDIRECT_URI
+// ) {
+// 	throw new Error("Google OAuth2 credentials are not set in .env file");
+// }
 
-if (!Bun.env.DATABASE_URL) {
-	throw new Error("DATABASE_URL is not set in .env file");
-}
+// if (!Bun.env.DATABASE_URL) {
+// 	throw new Error("DATABASE_URL is not set in .env file");
+// }
 
-const sql = neon(Bun.env.DATABASE_URL);
-const db = drizzle(sql, {
-	schema
-});
+// const sql = neon(Bun.env.DATABASE_URL);
+// const db = drizzle(sql, {
+// 	schema
+// });
 
-export type dbType = typeof db;
-export type schemaType = typeof schema;
+// export type dbType = typeof db;
+// export type schemaType = typeof schema;
 
 const buildTimeStamp = await build();
 
@@ -56,10 +56,10 @@ async function handleRequest(pageComponent: any, index: string) {
 }
 
 export const server = new Elysia()
-	.decorate({
-		db: db,
-		schema: schema
-	})
+	// .decorate({
+	// 	db: db,
+	// 	schema: schema
+	// })
 	.use(
 		staticPlugin({
 			assets: "./build",
@@ -68,11 +68,11 @@ export const server = new Elysia()
 	)
 	.use(
 		oauth2({
-			Google: [
-				Bun.env.GOOGLE_CLIENT_ID,
-				Bun.env.GOOGLE_CLIENT_SECRET,
-				Bun.env.GOOGLE_REDIRECT_URI
-			]
+			// Google: [
+			// 	Bun.env.GOOGLE_CLIENT_ID,
+			// 	Bun.env.GOOGLE_CLIENT_SECRET,
+			// 	Bun.env.GOOGLE_REDIRECT_URI
+			// ]
 		})
 	)
 	.use(
