@@ -3,7 +3,7 @@ import { AuthContext } from "../server";
 import { createUser, getUser } from "./userHandlers";
 
 export const authGoogle = async ({ oauth2 }: AuthContext) => {
-	await oauth2.redirect("Google", {
+	return await oauth2.redirect("Google", {
 		scopes: [
 			"https://www.googleapis.com/auth/userinfo.profile",
 			"https://www.googleapis.com/auth/userinfo.email"
