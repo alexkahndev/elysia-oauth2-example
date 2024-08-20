@@ -12,14 +12,12 @@
   "dependencies": {
     "@elysiajs/jwt": "^1.1.0",
     "@elysiajs/static": "^1.1.0",
-    "@elysiajs/swagger": "^1.1.0",
+    "@elysiajs/swagger": "^1.1.1",
     "@neondatabase/serverless": "^0.9.4",
     "arctic": "^1.9.2",
-    "drizzle-orm": "^0.32.0",
+    "drizzle-orm": "^0.32.2",
     "elysia": "1.1.2",
     "elysia-oauth2": "^1.3.0",
-    "google-auth-library": "^9.11.0",
-    "jsonwebtoken": "^9.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",
@@ -31,8 +29,8 @@
     "@types/react-dom": "^18.3.0",
     "@types/react-helmet": "^6.1.11",
     "@types/shelljs": "^0.8.15",
-    "bun-types": "^1.1.20",
-    "drizzle-kit": "^0.23.0"
+    "bun-types": "^1.1.24",
+    "drizzle-kit": "^0.23.2"
   },
   "module": "src/server.ts"
 }

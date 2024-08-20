@@ -20,7 +20,14 @@ async function revokeGoogleToken(accessToken: string) {
 
 export const handleSetRedirect = ({ request, cookie }: Context) => {
 	const url = request.headers.get("Referer");
-	cookie.redirectUrl.value = url;
+
+	cookie.redirectUrl.set({
+		value: url,
+		httpOnly: true,
+		secure: true,
+		path: "/",
+		sameSite: "strict"
+	});
 
 	return new Response(null, {
 		status: 204
@@ -28,7 +35,7 @@ export const handleSetRedirect = ({ request, cookie }: Context) => {
 };
 
 export const handleLogout = async ({ cookie }: Context) => {
-	const accessToken = cookie.googleAuthToken.value?.accessToken;
+	const accessToken = cookie.userAccessToken.value;
 
 	if (accessToken) {
 		try {
@@ -40,8 +47,6 @@ export const handleLogout = async ({ cookie }: Context) => {
 		}
 	}
 
-	cookie.googleAuthToken.remove();
-	cookie.user.remove();
 	cookie.redirectUrl.remove();
 
 	return new Response(null, {
@@ -50,7 +55,7 @@ export const handleLogout = async ({ cookie }: Context) => {
 };
 
 export const handleAuthStatus = ({ cookie }: Context) => {
-	const isLoggedIn = Boolean(cookie.user.value);
+	const isLoggedIn = Boolean(cookie.userAccessToken.value);
 	return new Response(JSON.stringify({ isLoggedIn }), {
 		headers: { "Content-Type": "application/json" }
 	});

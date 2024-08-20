@@ -52,8 +52,15 @@ export const authGoogleCallback = async ({
 
 		const redirectUrl = cookie.redirectUrl.value || "/";
 
-		cookie.googleAuthToken.value = token;
-		cookie.user.value = user;
+		cookie.userAccessToken.set({
+			value: token.accessToken,
+			httpOnly: true,
+			secure: true, 
+			path: "/", 
+			sameSite: 'strict' 
+		});
+		
+
 		cookie.redirectUrl.remove();
 
 		return redirect(redirectUrl);

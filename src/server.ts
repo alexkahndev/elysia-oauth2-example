@@ -73,7 +73,7 @@ export const server = new Elysia()
 				Bun.env.GOOGLE_CLIENT_SECRET,
 				Bun.env.GOOGLE_REDIRECT_URI
 			]
-		})
+		}).as("global")
 	)
 	.use(
 		swagger({
