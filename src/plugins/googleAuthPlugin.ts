@@ -42,13 +42,16 @@ export const googleAuthPlugin = ({ db, schema }: GoogleAuthPluginProps) => {
 		})
 		.get(
 			"/auth/google/callback",
-			async ({ oauth2, cookie, error, redirect }) => {
+			async ({
+				oauth2,
+				cookie: { redirectUrl, userAccessToken, userIdToken },
+				error,
+				redirect
+			}) => {
 				try {
 					const token = await oauth2.authorize("Google");
 
-					const idToken = token.idToken;
-
-					const decoded = jwt.decode(idToken) as {
+					const decoded = jwt.decode(token.idToken) as {
 						[key: string]: any;
 					};
 
@@ -75,16 +78,21 @@ export const googleAuthPlugin = ({ db, schema }: GoogleAuthPluginProps) => {
 						});
 					}
 
-					const redirectUrl = cookie.redirectUrl.value || "/";
-
-					cookie.userAccessToken.set({
+					userAccessToken.set({
 						value: token.accessToken,
 						secure: true,
 						httpOnly: true,
 						sameSite: "strict"
 					});
 
-					return redirect(redirectUrl);
+					userIdToken.set({
+						value: token.idToken,
+						secure: true,
+						httpOnly: true,
+						sameSite: "strict"
+					});
+
+					return redirect(redirectUrl.value || "/");
 				} catch (err) {
 					if (err instanceof Error) {
 						console.error(

@@ -14,18 +14,26 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 		window.location.href = "/auth/google";
 	};
 
-	const handleSignup = async () => {
-		// Implement sign-up logic here, e.g., API call
-		// Ensure password and confirmPassword match
+	const handleSignup = async (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
 		if (password !== confirmPassword) {
 			alert("Passwords do not match!");
 			return;
 		}
-		// Perform the signup operation
+
+		const response = await fetch(`/auth/app/signup`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ email, password })
+		});
+
+		console.log("signed up", response);
 	};
 
 	return (
-		<div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
+		<form style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
 			<h2
 				style={{
 					marginBottom: "20px",
@@ -38,6 +46,7 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 			</h2>
 			<input
 				type="email"
+				autoComplete="email"
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
 				placeholder="Email"
@@ -52,6 +61,7 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 			/>
 			<input
 				type="password"
+				autoComplete="new-password"
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				placeholder="Password"
@@ -66,6 +76,7 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 			/>
 			<input
 				type="password"
+				autoComplete="new-password"
 				value={confirmPassword}
 				onChange={(e) => setConfirmPassword(e.target.value)}
 				placeholder="Confirm Password"
@@ -120,6 +131,6 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 			>
 				Already have an account? Login here.
 			</p>
-		</div>
+		</form>
 	);
 };

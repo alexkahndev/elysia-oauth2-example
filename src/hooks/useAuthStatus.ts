@@ -12,7 +12,6 @@ export const useAuthStatus = () => {
 	const [userIdentity, setUserIdentity] = useState<UserIdentity | null>(null);
 
 	const checkAuthStatus = async () => {
-		console.log("Checking auth status");
 		try {
 			const response = await fetch("/auth-status");
 

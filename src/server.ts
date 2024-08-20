@@ -19,10 +19,6 @@ if (!process.env.DATABASE_URL) {
 	throw new Error("DATABASE_URL is not set in .env file");
 }
 
-if (!process.env.JWT_SECRET) {
-	throw new Error("JWT_SECRET is not set in .env file");
-}
-
 const sql = neon(process.env.DATABASE_URL);
 const db = drizzle(sql, {
 	schema
@@ -53,7 +49,7 @@ export const server = new Elysia()
 			prefix: ""
 		})
 	)
-	.use(absoluteAuthPlugin({db,schema}))
+	.use(absoluteAuthPlugin({ db, schema }))
 	.use(
 		swagger({
 			provider: doYouLikeSwaggerUIBetter ? "swagger-ui" : "scalar"
