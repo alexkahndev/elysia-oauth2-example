@@ -7,7 +7,6 @@ import { Home } from "./pages/Home";
 import { ClientPortal } from "./pages/ClientPortal";
 import { oauth2 } from "elysia-oauth2";
 import { build } from "./build";
-import { authGoogle, authGoogleCallback } from "./handlers/googleAuthHandlers";
 import {
 	handleAuthStatus,
 	handleLogout,
@@ -16,23 +15,30 @@ import {
 import * as schema from "../db/schema";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
+import { jwt } from "@elysiajs/jwt";
+import { authApp } from "./handlers/appAuthHandlers";
+import { googleAuthPlugin } from "./plugins/googleAuthPlugin";
 
-const host = Bun.env.HOST || "localhost";
-const port = Bun.env.PORT || 3000;
+const host = process.env.HOST || "localhost";
+const port = process.env.PORT || 3000;
 
 if (
-	!Bun.env.GOOGLE_CLIENT_ID ||
-	!Bun.env.GOOGLE_CLIENT_SECRET ||
-	!Bun.env.GOOGLE_REDIRECT_URI
+	!process.env.GOOGLE_CLIENT_ID ||
+	!process.env.GOOGLE_CLIENT_SECRET ||
+	!process.env.GOOGLE_REDIRECT_URI
 ) {
 	throw new Error("Google OAuth2 credentials are not set in .env file");
 }
 
-if (!Bun.env.DATABASE_URL) {
+if (!process.env.DATABASE_URL) {
 	throw new Error("DATABASE_URL is not set in .env file");
 }
 
-const sql = neon(Bun.env.DATABASE_URL);
+if (!process.env.JWT_SECRET) {
+	throw new Error("JWT_SECRET is not set in .env file");
+}
+
+const sql = neon(process.env.DATABASE_URL);
 const db = drizzle(sql, {
 	schema
 });
@@ -56,10 +62,6 @@ async function handleRequest(pageComponent: any, index: string) {
 }
 
 export const server = new Elysia()
-	.decorate({
-		db: db,
-		schema: schema
-	})
 	.use(
 		staticPlugin({
 			assets: "./build",
@@ -67,14 +69,14 @@ export const server = new Elysia()
 		})
 	)
 	.use(
-		oauth2({
-			Google: [
-				Bun.env.GOOGLE_CLIENT_ID,
-				Bun.env.GOOGLE_CLIENT_SECRET,
-				Bun.env.GOOGLE_REDIRECT_URI
-			]
-		}).as("global")
+		googleAuthPlugin({db,schema})
 	)
+	// .use(
+	// 	jwt({
+	// 		name: "myJWTNamespace",
+	// 		secret: process.env.JWT_SECRET
+	// 	}).as("global")
+	// )
 	.use(
 		swagger({
 			provider: doYouLikeSwaggerUIBetter ? "swagger-ui" : "scalar"
@@ -82,14 +84,15 @@ export const server = new Elysia()
 	);
 
 type Server = typeof server;
-export type AuthContext = Context<RouteBase, Server["singleton"]>;
+export type AppContext = Context<RouteBase, Server["singleton"]>;
 
 server
 	.get("/", () =>
 		handleRequest(Home, `indexes/HomeIndex.${buildTimeStamp}.js`)
 	)
-	.get("/auth/google", authGoogle)
-	.get("/auth/google/callback", authGoogleCallback)
+	// .get("/auth/google", authGoogle)
+	// .get("/auth/app", authApp)
+	// .get("/auth/google/callback", authGoogleCallback)
 	.get("/portal", () =>
 		handleRequest(
 			ClientPortal,

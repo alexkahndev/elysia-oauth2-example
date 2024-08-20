@@ -21,8 +21,6 @@ export const games = pgTable("games", {
 });
 
 export const owned_games = pgTable("owned_games", {
-	auth_sub: integer("auth_sub").references(
-		() => users.auth_sub
-	),
+	auth_sub: integer("auth_sub").references(() => users.auth_sub),
 	game_id: integer("game_id").references(() => games.game_id)
 });
