@@ -5,19 +5,12 @@ import { swagger } from "@elysiajs/swagger";
 import { createElement } from "react";
 import { Home } from "./pages/Home";
 import { ClientPortal } from "./pages/ClientPortal";
-import { oauth2 } from "elysia-oauth2";
 import { build } from "./build";
-import {
-	handleAuthStatus,
-	handleLogout,
-	handleSetRedirect
-} from "./handlers/userHandlers";
 import * as schema from "../db/schema";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { jwt } from "@elysiajs/jwt";
-import { authApp } from "./handlers/appAuthHandlers";
 import { googleAuthPlugin } from "./plugins/googleAuthPlugin";
+import { absoluteAuthPlugin } from "./plugins/absoluteAuth";
 
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 3000;
@@ -68,40 +61,21 @@ export const server = new Elysia()
 			prefix: ""
 		})
 	)
-	.use(
-		googleAuthPlugin({db,schema})
-	)
-	// .use(
-	// 	jwt({
-	// 		name: "myJWTNamespace",
-	// 		secret: process.env.JWT_SECRET
-	// 	}).as("global")
-	// )
+	.use(absoluteAuthPlugin({db,schema}))
 	.use(
 		swagger({
 			provider: doYouLikeSwaggerUIBetter ? "swagger-ui" : "scalar"
 		})
-	);
-
-type Server = typeof server;
-export type AppContext = Context<RouteBase, Server["singleton"]>;
-
-server
+	)
 	.get("/", () =>
 		handleRequest(Home, `indexes/HomeIndex.${buildTimeStamp}.js`)
 	)
-	// .get("/auth/google", authGoogle)
-	// .get("/auth/app", authApp)
-	// .get("/auth/google/callback", authGoogleCallback)
 	.get("/portal", () =>
 		handleRequest(
 			ClientPortal,
 			`indexes/ClientPortalIndex.${buildTimeStamp}.js`
 		)
 	)
-	.post("/set-redirect-url", handleSetRedirect)
-	.post("/logout", handleLogout)
-	.get("/auth-status", handleAuthStatus)
 	.listen(port, () => {
 		console.log(`server started on http://${host}:${port}`);
 	})
