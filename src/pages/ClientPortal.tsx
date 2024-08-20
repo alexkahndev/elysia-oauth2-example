@@ -5,7 +5,8 @@ import { useAuthStatus } from "../hooks/useAuthStatus";
 
 export const ClientPortal = () => {
 	const [count, setCount] = useState(0);
-	const [isLoggedIn, setIsLoggedIn] = useAuthStatus();
+	const { isLoggedIn, setIsLoggedIn, userIdentity, setUserIdentity } =
+		useAuthStatus();
 	return (
 		<html>
 			<head>
@@ -26,7 +27,12 @@ export const ClientPortal = () => {
 					margin: "0"
 				}}
 			>
-				<Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+				<Navbar
+					isLoggedIn={isLoggedIn}
+					setIsLoggedIn={setIsLoggedIn}
+					userIdentity={userIdentity}
+					setUserIdentity={setUserIdentity}
+				/>
 				<main
 					style={{
 						flex: "1",

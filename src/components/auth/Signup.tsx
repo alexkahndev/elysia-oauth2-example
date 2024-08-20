@@ -9,6 +9,8 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 
+	const handleGoogleSignup = async () => {};
+
 	const handleSignup = async () => {
 		// Implement sign-up logic here, e.g., API call
 		// Ensure password and confirmPassword match

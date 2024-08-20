@@ -60,6 +60,22 @@ export const authGoogleCallback = async ({
 			path: "/"
 		});
 
+		cookie.userRefreshToken.set({
+			value: token.refreshToken,
+			secure: true,
+			httpOnly: true,
+			sameSite: "strict",
+			path: "/"
+		});
+
+		cookie.userIdToken.set({
+			value: idToken,
+			secure: true,
+			httpOnly: true,
+			sameSite: "strict",
+			path: "/"
+		});
+
 		cookie.redirectUrl.remove();
 
 		return redirect(redirectUrl);
@@ -84,3 +100,19 @@ export const authGoogleCallback = async ({
 		}
 	}
 };
+
+export async function revokeGoogleToken(accessToken: string) {
+	const response = await fetch(
+		`https://accounts.google.com/o/oauth2/revoke?token=${accessToken}`,
+		{
+			method: "POST",
+			headers: {
+				"Content-type": "application/x-www-form-urlencoded"
+			}
+		}
+	);
+
+	if (!response.ok) {
+		throw new Error("Failed to revoke token");
+	}
+}

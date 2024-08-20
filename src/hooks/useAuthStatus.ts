@@ -1,17 +1,31 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 
-export const useAuthStatus = (): [
-	boolean,
-	React.Dispatch<React.SetStateAction<boolean>>
-] => {
+export type UserIdentity = {
+	givenName: string;
+	familyName: string;
+	email: string;
+	picture: string;
+};
+
+export const useAuthStatus = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [userIdentity, setUserIdentity] = useState<UserIdentity | null>(null);
 
 	const checkAuthStatus = async () => {
+		console.log("Checking auth status");
 		try {
 			const response = await fetch("/auth-status");
+
 			if (response.ok) {
 				const data = await response.json();
+
 				setIsLoggedIn(data.isLoggedIn);
+				setUserIdentity({
+					givenName: data.givenName,
+					familyName: data.familyName,
+					email: data.email,
+					picture: data.picture
+				});
 			} else {
 				console.error("Failed to check auth status");
 			}
@@ -24,5 +38,10 @@ export const useAuthStatus = (): [
 		checkAuthStatus();
 	}, []);
 
-	return [isLoggedIn, setIsLoggedIn];
+	return {
+		isLoggedIn,
+		setIsLoggedIn,
+		userIdentity,
+		setUserIdentity
+	};
 };

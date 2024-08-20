@@ -1,22 +1,8 @@
 import { Context } from "elysia";
 import { dbType, schemaType } from "../server";
 import { eq } from "drizzle-orm";
-
-async function revokeGoogleToken(accessToken: string) {
-	const response = await fetch(
-		`https://accounts.google.com/o/oauth2/revoke?token=${accessToken}`,
-		{
-			method: "POST",
-			headers: {
-				"Content-type": "application/x-www-form-urlencoded"
-			}
-		}
-	);
-
-	if (!response.ok) {
-		throw new Error("Failed to revoke token");
-	}
-}
+import { revokeGoogleToken } from "./googleAuthHandlers";
+import jwt from "jsonwebtoken";
 
 export const handleSetRedirect = ({ request, cookie }: Context) => {
 	const url = request.headers.get("Referer") || "/";
@@ -58,10 +44,34 @@ export const handleLogout = async ({ cookie }: Context) => {
 export const handleAuthStatus = ({ cookie }: Context) => {
 	const isLoggedIn = Boolean(cookie.userAccessToken.value);
 
+	const userIdToken = cookie.userIdToken.value;
 
-	return new Response(JSON.stringify({ isLoggedIn }), {
-		headers: { "Content-Type": "application/json" }
-	});
+	let givenName = "";
+	let familyName = "";
+	let email = "";
+	let picture = "";
+
+	if (userIdToken) {
+		const decoded = jwt.decode(userIdToken) as { [key: string]: any };
+
+		givenName = decoded.given_name;
+		familyName = decoded.family_name;
+		email = decoded.email;
+		picture = decoded.picture;
+	}
+
+	return new Response(
+		JSON.stringify({
+			isLoggedIn,
+			givenName,
+			familyName,
+			email,
+			picture
+		}),
+		{
+			headers: { "Content-Type": "application/json" }
+		}
+	);
 };
 
 type UserFunctionProps = {

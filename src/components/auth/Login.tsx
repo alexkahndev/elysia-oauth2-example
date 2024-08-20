@@ -5,16 +5,12 @@ type LoginProps = {
 export const Login = ({ switchToSignUp }: LoginProps) => {
 	const handleGoogleLogin = async () => {
 		// Redirect to Google OAuth login
-		await storeRedirectUrl();
+		await fetch("/set-redirect-url", { method: "POST" });
 		window.location.href = "/auth/google";
 	};
 
 	const handleEmailLogin = async () => {
 		// Implement email login logic here
-	};
-
-	const storeRedirectUrl = async () => {
-		await fetch("/set-redirect-url", { method: "POST" });
 	};
 
 	return (
