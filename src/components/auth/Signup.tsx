@@ -9,7 +9,10 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 
-	const handleGoogleSignup = async () => {};
+	const handleGoogleSignup = async () => {
+		await fetch("/set-redirect-url", { method: "POST" });
+		window.location.href = "/auth/google";
+	};
 
 	const handleSignup = async () => {
 		// Implement sign-up logic here, e.g., API call
@@ -75,6 +78,22 @@ export const Signup = ({ switchToLogin }: SignupProps) => {
 					borderRadius: "4px"
 				}}
 			/>
+			<button
+				onClick={handleGoogleSignup}
+				style={{
+					display: "block",
+					width: "100%",
+					padding: "10px",
+					marginBottom: "10px",
+					backgroundColor: "#4285F4",
+					color: "#fff",
+					border: "none",
+					borderRadius: "4px",
+					cursor: "pointer"
+				}}
+			>
+				Sign Up with Google
+			</button>
 			<button
 				onClick={handleSignup}
 				style={{

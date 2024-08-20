@@ -40,7 +40,6 @@ export const authGoogleCallback = async ({
 
 		if (user === null) {
 			user = await createUser({
-				event_games_sub: 1,
 				authSub,
 				givenName,
 				familyName,

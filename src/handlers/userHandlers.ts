@@ -82,7 +82,6 @@ type UserFunctionProps = {
 
 type NewUser = {
 	authSub: string;
-	event_games_sub: number;
 	email: string;
 	givenName: string;
 	familyName: string;
@@ -103,7 +102,6 @@ export const getUser = async ({ authSub, db, schema }: UserFunctionProps) => {
 };
 
 export const createUser = async ({
-	event_games_sub,
 	authSub,
 	givenName,
 	familyName,
@@ -115,7 +113,6 @@ export const createUser = async ({
 		.insert(schema.users)
 		.values({
 			auth_sub: authSub,
-			event_games_sub,
 			email,
 			given_name: givenName,
 			family_name: familyName

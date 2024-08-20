@@ -88,7 +88,8 @@ export const Navbar = ({
 				</a>
 				{isLoggedIn && userIdentity ? (
 					<>
-						<button
+						{/* remove logout button in production */}
+						<button 
 							onClick={handleSignOut}
 							style={{
 								color: "#fff",
