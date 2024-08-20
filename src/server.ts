@@ -15,14 +15,6 @@ import { absoluteAuthPlugin } from "./plugins/absoluteAuth";
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 3000;
 
-if (
-	!process.env.GOOGLE_CLIENT_ID ||
-	!process.env.GOOGLE_CLIENT_SECRET ||
-	!process.env.GOOGLE_REDIRECT_URI
-) {
-	throw new Error("Google OAuth2 credentials are not set in .env file");
-}
-
 if (!process.env.DATABASE_URL) {
 	throw new Error("DATABASE_URL is not set in .env file");
 }
