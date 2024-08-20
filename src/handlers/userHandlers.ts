@@ -19,14 +19,14 @@ async function revokeGoogleToken(accessToken: string) {
 }
 
 export const handleSetRedirect = ({ request, cookie }: Context) => {
-	const url = request.headers.get("Referer");
+	const url = request.headers.get("Referer") || "/";
 
 	cookie.redirectUrl.set({
 		value: url,
-		httpOnly: true,
 		secure: true,
-		path: "/",
-		sameSite: "strict"
+		httpOnly: true,
+		sameSite: "lax", // allows for top-level navigation for ouath flow
+		path: "/"
 	});
 
 	return new Response(null, {
@@ -40,6 +40,7 @@ export const handleLogout = async ({ cookie }: Context) => {
 	if (accessToken) {
 		try {
 			await revokeGoogleToken(accessToken);
+			cookie.userAccessToken.remove();
 		} catch (error) {
 			if (error instanceof Error) {
 				console.error("Failed to revoke token:", error.message);
@@ -56,6 +57,8 @@ export const handleLogout = async ({ cookie }: Context) => {
 
 export const handleAuthStatus = ({ cookie }: Context) => {
 	const isLoggedIn = Boolean(cookie.userAccessToken.value);
+
+
 	return new Response(JSON.stringify({ isLoggedIn }), {
 		headers: { "Content-Type": "application/json" }
 	});
@@ -68,18 +71,14 @@ type UserFunctionProps = {
 };
 
 type NewUser = {
-    authSub: string;
-    event_games_sub: number;
-    email: string;
-    givenName: string;
-    familyName: string;
+	authSub: string;
+	event_games_sub: number;
+	email: string;
+	givenName: string;
+	familyName: string;
 };
 
-export const getUser = async ({
-	authSub,
-	db,
-	schema
-}: UserFunctionProps) => {
+export const getUser = async ({ authSub, db, schema }: UserFunctionProps) => {
 	const user = await db
 		.select()
 		.from(schema.users)
@@ -94,7 +93,7 @@ export const getUser = async ({
 };
 
 export const createUser = async ({
-    event_games_sub,
+	event_games_sub,
 	authSub,
 	givenName,
 	familyName,

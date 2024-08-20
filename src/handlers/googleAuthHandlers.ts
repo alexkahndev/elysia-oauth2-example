@@ -54,12 +54,11 @@ export const authGoogleCallback = async ({
 
 		cookie.userAccessToken.set({
 			value: token.accessToken,
+			secure: true,
 			httpOnly: true,
-			secure: true, 
-			path: "/", 
-			sameSite: 'strict' 
+			sameSite: "strict",
+			path: "/"
 		});
-		
 
 		cookie.redirectUrl.remove();
 
