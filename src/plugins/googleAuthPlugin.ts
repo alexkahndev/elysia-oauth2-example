@@ -32,13 +32,17 @@ export const googleAuthPlugin = ({ db, schema }: GoogleAuthPluginProps) => {
 				]
 			})
 		)
-		.get("/auth/google", async ({ oauth2 }) => {
-			return await oauth2.redirect("Google", {
+		.get("/auth/google", async ({ oauth2, redirect }) => {
+			const authorizationUrl = await oauth2.createURL("Google", {
 				scopes: [
 					"https://www.googleapis.com/auth/userinfo.profile",
 					"https://www.googleapis.com/auth/userinfo.email"
 				]
 			});
+
+			authorizationUrl.searchParams.set("access_type", "offline");
+
+			return redirect(authorizationUrl.toString());
 		})
 		.get(
 			"/auth/google/callback",
@@ -50,6 +54,8 @@ export const googleAuthPlugin = ({ db, schema }: GoogleAuthPluginProps) => {
 			}) => {
 				try {
 					const token = await oauth2.authorize("Google");
+
+					console.log("Google token:", token);
 
 					const decoded = jwt.decode(token.idToken) as {
 						[key: string]: any;

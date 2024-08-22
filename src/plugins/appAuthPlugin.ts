@@ -1,6 +1,6 @@
-import {Elysia, t}  from "elysia";
+import { Elysia, t } from "elysia";
 import { dbType, schemaType } from "../server";
-import { jwt}  from "@elysiajs/jwt";
+import { jwt } from "@elysiajs/jwt";
 
 type AppAuthPluginProps = {
 	db: dbType;
@@ -19,17 +19,19 @@ export const appAuthPlugin = ({ db, schema }: AppAuthPluginProps) => {
 				secret: process.env.JWT_SECRET
 			})
 		)
-		// @ts-expect-error
-		.post("/auth/app/signup", async ({  jwt,body}) => {
-			const { email, password } = body;
+		.post(
+			"/auth/app/signup",
+			// @ts-expect-error
+			async ({ jwt, body }) => {
+				const { email, password } = body;
 
-			console.log("signed up", email, password);
-		},
-		{
-			body: t.Object({
-				email: t.String(),
-				password: t.String()
-			})
-		}
-	)
+				console.log("signed up", email, password);
+			},
+			{
+				body: t.Object({
+					email: t.String(),
+					password: t.String()
+				})
+			}
+		);
 };
