@@ -48,14 +48,12 @@ export const googleAuthPlugin = ({ db, schema }: GoogleAuthPluginProps) => {
 			"/auth/google/callback",
 			async ({
 				oauth2,
-				cookie: { redirectUrl, userAccessToken, userIdToken },
+				cookie: { redirectUrl, userAccessToken, userRefreshToken },
 				error,
 				redirect
 			}) => {
 				try {
 					const token = await oauth2.authorize("Google");
-
-					console.log("Google token:", token);
 
 					const decoded = jwt.decode(token.idToken) as {
 						[key: string]: any;
@@ -91,8 +89,8 @@ export const googleAuthPlugin = ({ db, schema }: GoogleAuthPluginProps) => {
 						sameSite: "strict"
 					});
 
-					userIdToken.set({
-						value: token.idToken,
+					userRefreshToken.set({
+						value: token.refreshToken,
 						secure: true,
 						httpOnly: true,
 						sameSite: "strict"

@@ -5,7 +5,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,css}\"",
     "dev": "bun run --watch src/server.ts",
-    "db:generate": "drizzle-kit generate:pg --schema ./db/schema.ts --out=./db/migrations",
+    "db:generate": "drizzle-kit generate --schema ./db/schema.ts --dialect postgresql",
     "db:migrate": "bun run ./db/migrate.ts",
     "db:studio": "drizzle-kit studio"
   },

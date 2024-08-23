@@ -70,24 +70,13 @@ export const absoluteAuthPlugin = ({ db, schema }: AbsoluteAuthPluginProps) => {
 				});
 			}
 		)
-		.get("/auth-status", ({ cookie: { userAccessToken, userIdToken } }) => {
+		.get("/auth-status", ({ cookie: { userAccessToken } }) => {
 			const isLoggedIn = Boolean(userAccessToken.value);
 
 			let givenName = "";
 			let familyName = "";
 			let email = "";
 			let picture = "";
-
-			if (userIdToken.value) {
-				const decoded = jwt.decode(userIdToken.value) as {
-					[key: string]: any;
-				};
-
-				givenName = decoded.given_name;
-				familyName = decoded.family_name;
-				email = decoded.email;
-				picture = decoded.picture;
-			}
 
 			return new Response(
 				JSON.stringify({
